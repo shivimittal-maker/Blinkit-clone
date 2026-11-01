@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7cb46">
+  <title>blinkit — Groceries delivered in minutes</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --yellow: #f7cb46;
+      --ink: #202020;
+      --muted: #777;
+      --green: #0c831f;
+      --line: #eee;
+      --page: #fff;
+      --soft: #f7f7f7;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--page);
+    }
+
+    button, input { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+
+    .topbar {
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 14px max(5vw, calc((100vw - 1200px) / 2));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      flex: 0 0 150px;
+      color: #111;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -2px;
+    }
+
+    .brand span { color: #e8ad00; }
+
+    .delivery {
+      flex: 0 0 190px;
+      line-height: 1.35;
+    }
+
+    .delivery strong {
+      display: block;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .delivery span {
+      display: block;
+      color: #555;
+      font-size: 12px;
+    }
+
+    .search {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 10px;
+      padding: 0 15px;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      background: #f8f8f8;
+      color: #666;
+    }
+
+    .search span { font-size: 19px; }
+
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 14px;
+    }
+
+    .login {
+      padding: 12px 4px;
+      font-size: 16px;
+      color: #363636;
+    }
+
+    .cart {
+      min-width: 105px;
+      padding: 13px 15px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--green);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    main {
+      width: min(1200px, 90%);
+      margin: 24px auto 60px;
+    }
+
+    .hero {
+      min-height: 255px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      overflow: hidden;
+      border-radius: 18px;
+      background: linear-gradient(110deg, #fff5d5, #fff0ba 58%, #ffe49a);
+    }
+
+    .hero-copy { padding: 38px 0 38px 7%; }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #795b00;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 440px;
+      margin: 0;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -1.7px;
+    }
+
+    .hero-copy > p:not(.eyebrow) {
+      margin: 13px 0 0;
+      color: #5a5140;
+      font-size: 16px;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: 255px;
+      object-fit: cover;
+      object-position: center 54%;
+      mix-blend-mode: multiply;
+      mask-image: linear-gradient(to right, transparent, #000 18%);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 34px 0 17px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: -.5px;
+    }
+
+    .see-all {
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .category {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      text-align: center;
+    }
+
+    .category img {
+      width: 100%;
+      max-width: 104px;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 14px;
+      background: #f7f2e7;
+    }
+
+    .category span {
+      max-width: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .product {
+      min-width: 0;
+      position: relative;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      background: #fff;
+      transition: box-shadow .2s, transform .2s;
+    }
+
+    .product:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px #0000000d;
+    }
+
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1.12;
+      display: block;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f7f7f7;
+    }
+
+    .time {
+      width: fit-content;
+      margin: 10px 0 7px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      background: #f5f5f5;
+      color: #505050;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .product h3 {
+      min-height: 36px;
+      margin: 0 0 5px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .size {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .price { font-size: 13px; font-weight: 800; }
+
+    .add {
+      padding: 7px 15px;
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      background: #f2fff4;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .promo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 34px;
+      padding: 24px 28px;
+      border-radius: 14px;
+      background: #eff8ea;
+    }
+
+    .promo h2 { margin: 0 0 6px; font-size: 20px; }
+    .promo p { margin: 0; color: #57634f; font-size: 14px; }
+    .promo img { width: 115px; height: 76px; object-fit: cover; border-radius: 10px; }
+
+    footer {
+      padding: 25px 5%;
+      border-top: 1px solid var(--line);
+      color: #777;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .topbar { gap: 16px; padding-right: 5%; padding-left: 5%; }
+      .brand { flex-basis: 115px; font-size: 27px; }
+      .delivery { flex-basis: 150px; }
+      .categories { grid-template-columns: repeat(5, minmax(0, 1fr)); row-gap: 20px; }
+      .products { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 9px 14px;
+        padding: 12px 5%;
+      }
+
+      .brand { grid-column: 1; grid-row: 1; }
+      .delivery { grid-column: 1; grid-row: 2; }
+      .delivery strong { font-size: 14px; }
+      .delivery span { font-size: 11px; }
+      .login { grid-column: 2; grid-row: 1; justify-self: end; padding: 7px; }
+      .cart { grid-column: 2; grid-row: 2; justify-self: end; min-width: 92px; }
+      .search { grid-column: 1 / -1; grid-row: 3; height: 43px; }
+
+      main { width: 92%; margin-top: 17px; }
+      .hero {
+        min-height: 205px;
+        grid-template-columns: 1fr .7fr;
+        border-radius: 13px;
+      }
+      .hero-copy { padding: 22px 0 22px 7%; }
+      .hero h1 { font-size: 30px; letter-spacing: -1px; }
+      .hero-copy > p:not(.eyebrow) { font-size: 13px; line-height: 1.5; }
+      .eyebrow { font-size: 10px; }
+      .hero-image { height: 205px; }
+      .section-heading { margin-top: 27px; }
+      .section-heading h2 { font-size: 19px; }
+      .categories { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 17px 9px; }
+      .category img { max-width: 88px; border-radius: 11px; }
+      .category span { font-size: 11px; }
+      .products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .product { padding: 8px; }
+      .product h3 { font-size: 12px; }
+      .promo { padding: 18px; }
+      .promo h2 { font-size: 17px; }
+      .promo p { font-size: 12px; line-height: 1.5; }
+      .promo img { width: 82px; height: 66px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="blinkit home">blink<span>it</span></a>
+    <div class="delivery">
+      <strong>Delivery in 10 minutes</strong>
+      <span>Home · Your location ▾</span>
+    </div>
+    <label class="search">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" placeholder="Search for atta, dal, coke and more" aria-label="Search products">
+    </label>
+    <a class="login" href="#">Login</a>
+    <button class="cart" type="button">🛒 My Cart</button>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Fresh groceries offer">
+      <div class="hero-copy">
+        <p class="eyebrow">Good food, good mood</p>
+        <h1>Everyday groceries, delivered fresh.</h1>
+        <p>Your daily essentials are just a few minutes away.</p>
+      </div>
+      <img class="hero-image" src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Fresh colorful vegetables at a market">
+    </section>
+
+    <section aria-labelledby="categories-title">
+      <div class="section-heading">
+        <h2 id="categories-title">Shop by category</h2>
+        <a class="see-all" href="#products">See all →</a>
+      </div>
+      <div class="categories">
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Vegetables &amp; Fruits</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Dairy &amp; Breakfast</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1580913428735-bd3c269d6a82?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Cold Drinks &amp; Juices</span></a>
+        <a class="category" href="#products"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Crect width='240' height='240' rx='24' fill='%23fff1d2'/%3E%3Cellipse cx='120' cy='183' rx='59' ry='13' fill='%23ead7a8'/%3E%3Cpath d='M77 46 Q120 56 163 46 L155 181 Q120 194 85 181 Z' fill='%23f8c943' stroke='%23e3a817' stroke-width='4'/%3E%3Cpath d='M83 51 Q120 61 157 51' fill='none' stroke='%23fff0a8' stroke-width='5'/%3E%3Cellipse cx='106' cy='103' rx='19' ry='10' transform='rotate(-18 106 103)' fill='%23f1a82d'/%3E%3Cellipse cx='135' cy='112' rx='19' ry='10' transform='rotate(18 135 112)' fill='%23ffe18a'/%3E%3Cellipse cx='109' cy='132' rx='19' ry='10' transform='rotate(12 109 132)' fill='%23e99824'/%3E%3Ctext x='120' y='163' text-anchor='middle' font-family='Arial,sans-serif' font-size='15' font-weight='700' fill='%237a4415'%3ECHIPS%3C/text%3E%3C/svg%3E" alt=""><span>Snacks &amp; Munchies</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Bakery &amp; Biscuits</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Instant &amp; Frozen</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Personal Care</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Tea, Coffee &amp; More</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Atta, Rice &amp; Dal</span></a>
+        <a class="category" href="#products"><img src="https://images.unsplash.com/photo-1601600576337-c1d8a0d1373c?auto=format&amp;fit=crop&amp;w=240&amp;q=80" alt=""><span>Home &amp; Cleaning</span></a>
+      </div>
+    </section>
+
+    <section id="products" aria-labelledby="products-title">
+      <div class="section-heading">
+        <h2 id="products-title">Bestsellers</h2>
+        <a class="see-all" href="#">View all →</a>
+      </div>
+      <div class="products">
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Ripe red tomatoes">
+          <p class="time">⏱ 10 MINS</p><h3>Hybrid Tomato</h3><p class="size">500 g</p>
+          <div class="price-row"><span class="price">₹28</span><button class="add" type="button">ADD</button></div>
+        </article>
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Golden honey in a jar">
+          <p class="time">⏱ 10 MINS</p><h3>Farm Fresh Honey</h3><p class="size">500 g</p>
+          <div class="price-row"><span class="price">₹199</span><button class="add" type="button">ADD</button></div>
+        </article>
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Fresh milk in a glass bottle">
+          <p class="time">⏱ 10 MINS</p><h3>Full Cream Milk</h3><p class="size">1 litre</p>
+          <div class="price-row"><span class="price">₹68</span><button class="add" type="button">ADD</button></div>
+        </article>
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Fresh yellow bananas">
+          <p class="time">⏱ 10 MINS</p><h3>Robusta Banana</h3><p class="size">6 pieces</p>
+          <div class="price-row"><span class="price">₹42</span><button class="add" type="button">ADD</button></div>
+        </article>
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1598373182133-52452f7691ef?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Fresh white bread loaf">
+          <p class="time">⏱ 10 MINS</p><h3>Classic White Bread</h3><p class="size">400 g</p>
+          <div class="price-row"><span class="price">₹35</span><button class="add" type="button">ADD</button></div>
+        </article>
+        <article class="product">
+          <img class="product-image" src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&amp;fit=crop&amp;w=420&amp;q=80" alt="Fresh red apples">
+          <p class="time">⏱ 10 MINS</p><h3>Royal Gala Apples</h3><p class="size">4 pieces</p>
+          <div class="price-row"><span class="price">₹149</span><button class="add" type="button">ADD</button></div>
+        </article>
+      </div>
+    </section>
+
+    <aside class="promo">
+      <div><h2>A little more fresh, every day.</h2><p>Discover handpicked picks for your kitchen and home.</p></div>
+      <img src="https://images.unsplash.com/photo-1543168256-418811576931?auto=format&amp;fit=crop&amp;w=320&amp;q=80" alt="Fresh groceries ready for your kitchen">
+    </aside>
+  </main>
+
+  <footer>Made for everyday shopping · Fresh picks, fast delivery</footer>
+</body>
+</html>
